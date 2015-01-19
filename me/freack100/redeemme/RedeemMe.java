@@ -91,12 +91,14 @@ public class RedeemMe extends JavaPlugin{
 
         for(Map.Entry<String,String> set : currentCodes.entrySet()){
             currentCodes_Config.set(set.getKey(),set.getValue());
-            try {
-                currentCodes_Config.save(currentCodes_File);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
+
+        try {
+            currentCodes_Config.save(currentCodes_File);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
