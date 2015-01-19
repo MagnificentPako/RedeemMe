@@ -34,7 +34,12 @@ public class RedeemCodeCommand implements CommandExecutor {
         String type = plugin.currentCodes.get(code);
 
 
-        player.sendMessage("You redeemed a "+type+" code.");
+        String msg = plugin.messageHandler.getMessage("redeem");
+        player.sendMessage(msg
+                .replace("%USERNAME%",player.getName())
+                .replace("%CODE%",code)
+                .replace("%TYPE%",type)
+        );
         for(String command : plugin.types.get(type)){
             String theCommand = command.startsWith("/") ? command.substring(1) : command;
             plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),

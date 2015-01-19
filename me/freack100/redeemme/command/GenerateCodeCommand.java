@@ -22,11 +22,23 @@ public class GenerateCodeCommand implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 
-        if(!sender.hasPermission("redeemme.generate")) return true;
-        if(args.length != 1) return true;
-        if(!plugin.types.containsKey(args[0])) return true;
+        boolean execute = true;
 
-        sender.sendMessage("Here is your code of type "+args[0]+": "+plugin.generateCode(args[0]));
+        if(!(sender.hasPermission("redeemme.generate.*")) || !(sender.hasPermission("redeemme.generate."+args[0]))){execute = false;}
+        if(args.length != 1) execute = false;
+        if(!plugin.types.containsKey(args[0])) execute = false;
+
+        if(!execute){
+            sender.sendMessage(plugin.messageHandler.getMessage("noPermission"));
+            return true;
+        }
+
+        String message = plugin.messageHandler.getMessage("generate");
+        sender.sendMessage(message
+                .replace("%USERNAME%",sender.getName())
+                .replace("%TYPE%",args[0])
+                .replace("%CODE%",plugin.generateCode(args[0]))
+        );
 
         return true;
     }

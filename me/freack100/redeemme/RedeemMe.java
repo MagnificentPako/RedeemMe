@@ -11,6 +11,7 @@ package me.freack100.redeemme;
 
 import me.freack100.redeemme.command.*;
 import me.freack100.redeemme.util.CodeGenerator;
+import me.freack100.redeemme.util.MessageHandler;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,6 +25,7 @@ public class RedeemMe extends JavaPlugin{
     public CodeGenerator generator;
     public FileConfiguration config;
     public File config_file;
+    public MessageHandler messageHandler;
 
     private File currentCodes_File;
     private FileConfiguration currentCodes_Config;
@@ -41,6 +43,7 @@ public class RedeemMe extends JavaPlugin{
     @Override
     public void onEnable(){
         generator = new CodeGenerator();
+        messageHandler = new MessageHandler(this);
 
         //CONFIG
         if(!getDataFolder().exists()) getDataFolder().mkdir();
@@ -107,6 +110,9 @@ public class RedeemMe extends JavaPlugin{
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        generator = null;
+        messageHandler = null;
 
     }
 

@@ -29,7 +29,12 @@ public class RemoveCodeCommand implements CommandExecutor {
         if(!plugin.currentCodes.containsKey(code)) return true;
 
         plugin.currentCodes.remove(code);
-        sender.sendMessage("You removed the code "+code+" successful.");
+
+        String msg = plugin.messageHandler.getMessage("remove");
+        sender.sendMessage(msg
+                .replace("%USERNAME%",sender.getName())
+                .replace("%CODE%",code)
+        );
 
         return true;
     }

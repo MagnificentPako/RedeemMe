@@ -25,7 +25,10 @@ public class RemoveAllCodesCommand implements CommandExecutor {
         if(!sender.hasPermission("redeemme.removeAll")) return true;
 
         plugin.currentCodes.clear();
-        sender.sendMessage("You removed all codes successful.");
+        String msg = plugin.messageHandler.getMessage("removeAll");
+        sender.sendMessage(msg
+                .replace("%USERNAME%",sender.getName())
+        );
 
         return true;
     }
