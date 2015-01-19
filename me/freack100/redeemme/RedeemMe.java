@@ -12,8 +12,10 @@ package me.freack100.redeemme;
 import me.freack100.redeemme.command.*;
 import me.freack100.redeemme.util.CodeGenerator;
 import me.freack100.redeemme.util.MessageHandler;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -26,6 +28,7 @@ public class RedeemMe extends JavaPlugin{
     public FileConfiguration config;
     public File config_file;
     public MessageHandler messageHandler;
+    public Economy economy;
 
     private File currentCodes_File;
     private FileConfiguration currentCodes_Config;
@@ -45,20 +48,38 @@ public class RedeemMe extends JavaPlugin{
         generator = new CodeGenerator();
         messageHandler = new MessageHandler(this);
 
+        boolean firstTime = false;
+
         //CONFIG
         if(!getDataFolder().exists()) getDataFolder().mkdir();
         config_file = new File(getDataFolder() + File.separator + "config.yml");
         if(!config_file.exists()){
             try {
                 config_file.createNewFile();
-                config.save(config_file);
+                firstTime = true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
         config = YamlConfiguration.loadConfiguration(config_file);
+
         config.addDefault("codeLength",10);
+        config.addDefault("useEconomy",false);
         config.options().copyDefaults(true);
+
+        if(firstTime){
+            config.set("codeTypes.default.commands", Arrays.asList("/say This is the default code type."));
+            config.set("codeTypes.default.price",10);
+        }
+
+        try {
+            config.save(config_file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
 
         //CURRENT CODES
         currentCodes_File = new File(getDataFolder() + File.separator + "codes.yml");
@@ -76,6 +97,7 @@ public class RedeemMe extends JavaPlugin{
         System.out.println("[RedeemMe] Loaded "+currentCodes.size()+(currentCodes.size() == 1 ? " code." : " codes."));
 
         //LOAD CODE TYPES
+
         for(String type : config.getConfigurationSection("codeTypes").getKeys(false)){
             types.put(type,config.getConfigurationSection("codeTypes").getConfigurationSection(type).getStringList("commands"));
         }
@@ -87,6 +109,13 @@ public class RedeemMe extends JavaPlugin{
         getCommand("g3novrnintousnt").setExecutor(new OverNineThousandCommand(this));
         getCommand("removeCode").setExecutor(new RemoveCodeCommand(this));
         getCommand("removeAllCodes").setExecutor(new RemoveAllCodesCommand(this));
+
+        if(config.getBoolean("useEconomy")){
+            if(!setupEconomy()){
+                System.out.println("[RedeemMe] Disabled due to no Vault dependency found!");
+                getServer().getPluginManager().disablePlugin(this);
+            }
+        }
 
     }
 
@@ -114,6 +143,18 @@ public class RedeemMe extends JavaPlugin{
         generator = null;
         messageHandler = null;
 
+    }
+
+    private boolean setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+            return false;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return false;
+        }
+        economy = rsp.getProvider();
+        return economy != null;
     }
 
 }

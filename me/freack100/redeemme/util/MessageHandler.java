@@ -38,6 +38,8 @@ public class MessageHandler {
         config.addDefault("remove", "You removed a code.");
         config.addDefault("removeAll", "You removed all codes.");
         config.addDefault("noPermission", "You don't have the permissions to do this.");
+        config.addDefault("paid", "You paid for the generation of this code.");
+        config.addDefault("noMoney", "You don't have enough money to generate this code.");
 
         config.options().copyDefaults(true);
         try {

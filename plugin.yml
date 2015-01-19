@@ -1,7 +1,8 @@
 name: RedeemMe
-version: 1.1
+version: 1.2
 author: Freack100
 main: me.freack100.redeemme.RedeemMe
+softdepend: [ Vault ]
 commands:
     generateCode:
         description: Allows you to generate a code for a specific goody.

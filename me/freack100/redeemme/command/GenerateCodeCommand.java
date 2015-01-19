@@ -11,6 +11,7 @@ package me.freack100.redeemme.command;
 
 import me.freack100.redeemme.RedeemMe;
 import org.bukkit.command.*;
+import org.bukkit.entity.Player;
 
 public class GenerateCodeCommand implements CommandExecutor {
 
@@ -24,12 +25,29 @@ public class GenerateCodeCommand implements CommandExecutor {
 
         boolean execute = true;
 
-        if(!(sender.hasPermission("redeemme.generate.*")) || !(sender.hasPermission("redeemme.generate."+args[0]))){execute = false;}
+        if(!(sender.hasPermission("redeemme.generate.*")) || !(sender.hasPermission("redeemme.generate."+args[0]))){execute = false;sender.sendMessage(plugin.messageHandler.getMessage("noPermission"));}
         if(args.length != 1) execute = false;
         if(!plugin.types.containsKey(args[0])) execute = false;
 
-        if(!execute){
-            sender.sendMessage(plugin.messageHandler.getMessage("noPermission"));
+        double price = -1;
+
+        if(plugin.config.getBoolean("useEconomy")){
+            if(plugin.config.getConfigurationSection("codeTypes").getConfigurationSection(args[0]).contains("price")){
+                price = plugin.config.getDouble("codeTypes."+args[0]+".price");
+                if(sender instanceof Player){
+                    Player player = (Player) sender;
+                    if(plugin.economy.has(player,price)){
+                        plugin.economy.withdrawPlayer(player,price);
+                        player.sendMessage(plugin.messageHandler.getMessage("paid"));
+                    } else {
+                        player.sendMessage(plugin.messageHandler.getMessage("noMoney"));
+                        execute = false;
+                    }
+                }
+            }
+        }
+
+        if(!execute) {
             return true;
         }
 
