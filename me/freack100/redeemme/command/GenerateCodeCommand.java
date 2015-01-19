@@ -25,6 +25,7 @@ public class GenerateCodeCommand implements CommandExecutor {
 
         boolean execute = true;
 
+        if(args.length!=2) return true;
         if(!(sender.hasPermission("redeemme.generate.*")) || !(sender.hasPermission("redeemme.generate."+args[0]))){execute = false;sender.sendMessage(plugin.messageHandler.getMessage("noPermission"));}
         if(args.length != 1) execute = false;
         if(!plugin.types.containsKey(args[0])) execute = false;

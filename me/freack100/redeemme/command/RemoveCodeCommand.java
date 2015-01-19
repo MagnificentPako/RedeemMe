@@ -22,6 +22,8 @@ public class RemoveCodeCommand implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 
+        if(args.length != 1) return true;
+
         String code = args[0].toUpperCase();
 
         if(!sender.hasPermission("redeemme.remove")) return true;
