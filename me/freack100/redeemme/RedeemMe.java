@@ -10,6 +10,7 @@
 package me.freack100.redeemme;
 
 import me.freack100.redeemme.command.*;
+import me.freack100.redeemme.http.HTTPServerThread;
 import me.freack100.redeemme.util.CodeGenerator;
 import me.freack100.redeemme.util.MessageHandler;
 import net.milkbowl.vault.economy.Economy;
@@ -30,8 +31,11 @@ public class RedeemMe extends JavaPlugin{
     public MessageHandler messageHandler;
     public Economy economy;
 
+    private HTTPServerThread serverThread;
     private File currentCodes_File;
     private FileConfiguration currentCodes_Config;
+
+    private boolean useServer = false;
 
     public HashMap<String,String> currentCodes = new HashMap();
 
@@ -66,6 +70,9 @@ public class RedeemMe extends JavaPlugin{
 
         config.addDefault("codeLength",10);
         config.addDefault("useEconomy",false);
+        config.addDefault("serverIP","127.0.0.1");
+        config.addDefault("serverPassword","password");
+        config.addDefault("useServer",false);
         config.options().copyDefaults(true);
 
         if(firstTime){
@@ -117,10 +124,26 @@ public class RedeemMe extends JavaPlugin{
             }
         }
 
+        useServer = config.getBoolean("useServer");
+
+
+        if(useServer) {
+            try {
+                serverThread = new HTTPServerThread(this);
+                serverThread.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     @Override
     public void onDisable(){
+        if(useServer) {
+            serverThread.stopSocket();
+            serverThread.stop();
+        }
         //SAVE CURRENT CODES
         try {
             currentCodes_File.createNewFile();
