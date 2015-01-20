@@ -52,7 +52,7 @@ public class HTTPClientThread extends Thread {
                     String text = httpQueryString.replaceFirst("/","");
                     if(text.contains("/")){
                         String[] get = text.split("/");
-                        if(plugin.config.get("serverPassword").equals(get[0])){
+                        if(plugin.config.get("server.password").equals(get[0])){
                             if(plugin.types.containsKey(get[1])){
                                 responseBuffer.append(plugin.generateCode(get[1]));
                             }

@@ -9,7 +9,9 @@
 
 package me.freack100.redeemme;
 
+import me.freack100.redeemme.code.*;
 import me.freack100.redeemme.command.*;
+import me.freack100.redeemme.file.TextFile;
 import me.freack100.redeemme.http.HTTPServerThread;
 import me.freack100.redeemme.util.CodeGenerator;
 import me.freack100.redeemme.util.MessageHandler;
@@ -33,22 +35,31 @@ public class RedeemMe extends JavaPlugin{
 
     private HTTPServerThread serverThread;
     private File currentCodes_File;
-    private FileConfiguration currentCodes_Config;
+    private TextFile currentCodes_text;
 
     private boolean useServer = false;
 
-    public HashMap<String,String> currentCodes = new HashMap();
+    public CodeList currentCodes;
 
     public HashMap<String,List<String>> types = new HashMap();
 
+    public String generateCode(String type,CodeType mode){
+        String code_ = generator.nextCode(config.getInt("codeLength"));
+        Code code = new Code(code_,type,mode);
+        currentCodes.add(code);
+        return code_;
+    }
+
     public String generateCode(String type){
-        String code = generator.nextCode(config.getInt("codeLength"));
-        currentCodes.put(code,type);
-        return code;
+        String code_ = generator.nextCode(config.getInt("codeLength"));
+        Code code = new Code(code_,type,CodeType.NORMAL);
+        currentCodes.add(code);
+        return code_;
     }
 
     @Override
     public void onEnable(){
+        currentCodes = new CodeList();
         generator = new CodeGenerator();
         messageHandler = new MessageHandler(this);
 
@@ -70,9 +81,11 @@ public class RedeemMe extends JavaPlugin{
 
         config.addDefault("codeLength",10);
         config.addDefault("useEconomy",false);
-        config.addDefault("serverIP","127.0.0.1");
-        config.addDefault("serverPassword","password");
         config.addDefault("useServer",false);
+        config.addDefault("server.ip","127.0.0.1");
+        config.addDefault("server.password","password");
+        config.addDefault("server.port",1337);
+
         config.options().copyDefaults(true);
 
         if(firstTime){
@@ -87,20 +100,18 @@ public class RedeemMe extends JavaPlugin{
         }
 
 
-
         //CURRENT CODES
-        currentCodes_File = new File(getDataFolder() + File.separator + "codes.yml");
+        currentCodes_File = new File(getDataFolder() + File.separator + "codes.dat");
         if(!currentCodes_File.exists()) try {
             currentCodes_File.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        currentCodes_Config = YamlConfiguration.loadConfiguration(currentCodes_File);
-
-        //LOAD SAVED CODES
-        for(String key : currentCodes_Config.getKeys(false)){
-            currentCodes.put(key,currentCodes_Config.getString(key));
+        currentCodes_text = new TextFile(currentCodes_File);
+        for(String str : currentCodes_text.readContent().split(System.getProperty("line.separator"))){
+            currentCodes.add(Code.unSerialize(str));
         }
+
         System.out.println("[RedeemMe] Loaded "+currentCodes.size()+(currentCodes.size() == 1 ? " code." : " codes."));
 
         //LOAD CODE TYPES
@@ -146,19 +157,12 @@ public class RedeemMe extends JavaPlugin{
         }
         //SAVE CURRENT CODES
         try {
-            currentCodes_File.createNewFile();
-            currentCodes_File.delete();
-            currentCodes_Config = YamlConfiguration.loadConfiguration(currentCodes_File);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        for(Map.Entry<String,String> set : currentCodes.entrySet()){
-            currentCodes_Config.set(set.getKey(),set.getValue());
-        }
-
-        try {
-            currentCodes_Config.save(currentCodes_File);
+            currentCodes_text.writeContent("");
+            for(Code c : this.currentCodes.getCodes()){
+                if(c != null) {
+                    currentCodes_text.appendContent(c.serialize());
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

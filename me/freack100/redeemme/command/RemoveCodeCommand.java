@@ -28,9 +28,9 @@ public class RemoveCodeCommand implements CommandExecutor {
 
         if(!sender.hasPermission("redeemme.remove")) return true;
         if(args.length != 1) return true;
-        if(!plugin.currentCodes.containsKey(code)) return true;
+        if(!plugin.currentCodes.containsCode(code)) return true;
 
-        plugin.currentCodes.remove(code);
+        plugin.currentCodes.removeCode(code);
 
         String msg = plugin.messageHandler.getMessage("remove");
         sender.sendMessage(msg

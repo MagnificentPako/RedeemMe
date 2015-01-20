@@ -10,6 +10,7 @@
 package me.freack100.redeemme.command;
 
 import me.freack100.redeemme.RedeemMe;
+import me.freack100.redeemme.code.CodeType;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 
@@ -25,10 +26,12 @@ public class GenerateCodeCommand implements CommandExecutor {
 
         boolean execute = true;
 
-        if(args.length!=2) return true;
+        boolean customMode = false;
+
         if(!(sender.hasPermission("redeemme.generate.*")) || !(sender.hasPermission("redeemme.generate."+args[0]))){execute = false;sender.sendMessage(plugin.messageHandler.getMessage("noPermission"));}
-        if(args.length != 1) execute = false;
+        if(args.length == 0) execute = false;
         if(!plugin.types.containsKey(args[0])) execute = false;
+        if(args.length == 2) customMode = true;
 
         double price = -1;
 
@@ -52,11 +55,13 @@ public class GenerateCodeCommand implements CommandExecutor {
             return true;
         }
 
+        CodeType mode = (customMode ? CodeType.valueOf(args[1]) : CodeType.NORMAL);
+
         String message = plugin.messageHandler.getMessage("generate");
         sender.sendMessage(message
                 .replace("%USERNAME%",sender.getName())
                 .replace("%TYPE%",args[0])
-                .replace("%CODE%",plugin.generateCode(args[0]))
+                .replace("%CODE%",plugin.generateCode(args[0],mode))
         );
 
         return true;

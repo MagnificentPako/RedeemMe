@@ -24,8 +24,8 @@ public class HTTPServerThread extends Thread {
 
     public HTTPServerThread(RedeemMe plugin) throws IOException {
         this.plugin = plugin;
-        socket = new ServerSocket(1337,10, InetAddress.getByName(plugin.config.getString("serverIP")));
-        System.out.println("Opened server on port 1337.");
+        socket = new ServerSocket(plugin.config.getInt("server.port"),10, InetAddress.getByName(plugin.config.getString("server.ip")));
+        System.out.println("Opened server on port "+plugin.config.getInt("server.port")+".");
     }
 
     @Override

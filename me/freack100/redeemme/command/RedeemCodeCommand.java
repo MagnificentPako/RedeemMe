@@ -30,10 +30,10 @@ public class RedeemCodeCommand implements CommandExecutor {
 
         if(!(sender instanceof Player)) return true;
         if(args.length != 1) return true;
-        if(!plugin.currentCodes.containsKey(code)) return true;
+        if(!plugin.currentCodes.containsCode(code)) return true;
 
         Player player = (Player) sender;
-        String type = plugin.currentCodes.get(code);
+        String type = plugin.currentCodes.getByCode(code).getCodeType();
 
 
         String msg = plugin.messageHandler.getMessage("redeem");
@@ -51,7 +51,7 @@ public class RedeemCodeCommand implements CommandExecutor {
                             .replace("%CODE%",args[0])
             );
         }
-        plugin.currentCodes.remove(code);
+        plugin.currentCodes.removeCode(code);
         return true;
     }
 
