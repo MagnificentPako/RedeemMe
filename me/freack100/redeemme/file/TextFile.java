@@ -17,12 +17,18 @@ public class TextFile {
 
     public TextFile(File file){
         this.file = file;
+        if(!file.exists()) try {
+            file.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void writeContent(String content) throws IOException {
         Writer output = new BufferedWriter(new FileWriter(file));
         try{
             output.write(content);
+            //output.flush();
         }finally {
             output.close();
         }

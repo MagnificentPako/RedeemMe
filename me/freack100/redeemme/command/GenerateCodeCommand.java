@@ -11,8 +11,11 @@ package me.freack100.redeemme.command;
 
 import me.freack100.redeemme.RedeemMe;
 import me.freack100.redeemme.code.CodeType;
+import net.minecraft.server.v1_7_R4.EntitySquid;
+import net.minecraft.server.v1_7_R4.PacketPlayOutSpawnEntity;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Squid;
 
 public class GenerateCodeCommand implements CommandExecutor {
 
@@ -24,13 +27,11 @@ public class GenerateCodeCommand implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 
-        boolean execute = true;
-
         boolean customMode = false;
 
-        if(!(sender.hasPermission("redeemme.generate.*")) || !(sender.hasPermission("redeemme.generate."+args[0]))){execute = false;sender.sendMessage(plugin.messageHandler.getMessage("noPermission"));}
-        if(args.length == 0) execute = false;
-        if(!plugin.types.containsKey(args[0])) execute = false;
+        if(!(sender.hasPermission("redeemme.generate.*")) || !(sender.hasPermission("redeemme.generate."+args[0]))){sender.sendMessage(plugin.messageHandler.getMessage("noPermission")); return true;}
+        if(args.length == 0) return true;
+        if(!plugin.types.containsKey(args[0])) return true;
         if(args.length == 2) customMode = true;
 
         double price = -1;
@@ -45,14 +46,10 @@ public class GenerateCodeCommand implements CommandExecutor {
                         player.sendMessage(plugin.messageHandler.getMessage("paid"));
                     } else {
                         player.sendMessage(plugin.messageHandler.getMessage("noMoney"));
-                        execute = false;
+                        return true;
                     }
                 }
             }
-        }
-
-        if(!execute) {
-            return true;
         }
 
         CodeType mode = (customMode ? CodeType.valueOf(args[1]) : CodeType.NORMAL);

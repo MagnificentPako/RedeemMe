@@ -40,6 +40,7 @@ public class RedeemMe extends JavaPlugin{
     private boolean useServer = false;
 
     public CodeList currentCodes;
+    public PromoManager promoManager;
 
     public HashMap<String,List<String>> types = new HashMap();
 
@@ -62,6 +63,7 @@ public class RedeemMe extends JavaPlugin{
         currentCodes = new CodeList();
         generator = new CodeGenerator();
         messageHandler = new MessageHandler(this);
+        promoManager = new PromoManager(this);
 
         boolean firstTime = false;
 
@@ -121,6 +123,8 @@ public class RedeemMe extends JavaPlugin{
         }
         System.out.println("[RedeemMe] Loaded "+types.size()+" code " + (types.size() == 1 ? "type." : "types."));
 
+        promoManager.enable();
+
         //COMMANDS
         getCommand("generateCode").setExecutor(new GenerateCodeCommand(this));
         getCommand("redeemCode").setExecutor(new RedeemCodeCommand(this));
@@ -166,6 +170,8 @@ public class RedeemMe extends JavaPlugin{
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        promoManager.disable();
 
         generator = null;
         messageHandler = null;

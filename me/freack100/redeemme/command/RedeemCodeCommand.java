@@ -10,6 +10,7 @@
 package me.freack100.redeemme.command;
 
 import me.freack100.redeemme.RedeemMe;
+import me.freack100.redeemme.code.CodeType;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -31,27 +32,53 @@ public class RedeemCodeCommand implements CommandExecutor {
         if(!(sender instanceof Player)) return true;
         if(args.length != 1) return true;
         if(!plugin.currentCodes.containsCode(code)) return true;
+        //if(plugin.currentCodes.getByCode(code).getMode().equals(CodeType.PROMO)) sender.sendMessage("Promo codes are not yet supported.");
 
         Player player = (Player) sender;
+
         String type = plugin.currentCodes.getByCode(code).getCodeType();
+        CodeType mode = plugin.currentCodes.getByCode(code).getMode();
 
-
-        String msg = plugin.messageHandler.getMessage("redeem");
-        player.sendMessage(msg
-                .replace("%USERNAME%",player.getName())
-                .replace("%CODE%",code)
-                .replace("%TYPE%",type)
-        );
-        for(String command : plugin.types.get(type)){
-            String theCommand = command.startsWith("/") ? command.substring(1) : command;
-            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                    theCommand
-                            .replace("%USERNAME%",player.getName())
-                            .replace("%TYPE%",type)
-                            .replace("%CODE%",args[0])
-            );
+        if(mode.equals(CodeType.NORMAL)) {
+            player.sendMessage(plugin.messageHandler.formatMessage("redeem",
+                    player.getName(),
+                    code,
+                    type));
+            for (String command : plugin.types.get(type)) {
+                String theCommand = command.startsWith("/") ? command.substring(1) : command;
+                plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
+                        theCommand
+                                .replace("%USERNAME%", player.getName())
+                                .replace("%TYPE%", type)
+                                .replace("%CODE%", args[0])
+                );
+            }
+            plugin.currentCodes.removeCode(code);
+            return true;
         }
-        plugin.currentCodes.removeCode(code);
+        else if(mode.equals(CodeType.PROMO)){
+            if(plugin.promoManager.redeemPromo(plugin.currentCodes.getByCode(code),player.getUniqueId())){
+                player.sendMessage(plugin.messageHandler.formatMessage("redeemPromo",
+                        player.getName(),
+                        code,
+                        type));
+                for (String command : plugin.types.get(type)) {
+                    String theCommand = command.startsWith("/") ? command.substring(1) : command;
+                    plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
+                            theCommand
+                                    .replace("%USERNAME%", player.getName())
+                                    .replace("%TYPE%", type)
+                                    .replace("%CODE%", args[0])
+                    );
+                }
+            }else{
+                player.sendMessage(plugin.messageHandler.formatMessage("usedPromo",
+                        player.getName(),
+                        code,
+                        type));
+            }
+            return true;
+        }
         return true;
     }
 

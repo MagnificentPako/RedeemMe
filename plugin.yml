@@ -1,5 +1,5 @@
 name: RedeemMe
-version: "1.3.2"
+version: "1.4"
 author: Freack100
 main: me.freack100.redeemme.RedeemMe
 softdepend: [ Vault ]

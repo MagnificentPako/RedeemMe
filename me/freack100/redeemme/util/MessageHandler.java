@@ -35,11 +35,14 @@ public class MessageHandler {
 
         config.addDefault("generate", "Here is your code: %CODE%");
         config.addDefault("redeem", "You redeemed a code.");
+        config.addDefault("redeemPromo", "You redeemed a promo code.");
+        config.addDefault("usedPromo", "You used that promo code allready.");
         config.addDefault("remove", "You removed a code.");
         config.addDefault("removeAll", "You removed all codes.");
         config.addDefault("noPermission", "You don't have the permissions to do this.");
         config.addDefault("paid", "You paid for the generation of this code.");
         config.addDefault("noMoney", "You don't have enough money to generate this code.");
+
 
         config.options().copyDefaults(true);
         try {
@@ -53,5 +56,18 @@ public class MessageHandler {
         return ChatColor.translateAlternateColorCodes('&', config.getString(key));
     }
 
+    public String formatMessage(String key, String name, String type, String code){
+        String msg = getMessage(key);
+        if(name!=null){
+            msg = msg.replace("%USERNAME%",name);
+        }
+        if(type!=null){
+            msg = msg.replace("%TYPE%",type);
+        }
+        if(code!=null){
+            msg = msg.replace("%CODE%",code);
+        }
+        return msg;
+    }
 
 }
